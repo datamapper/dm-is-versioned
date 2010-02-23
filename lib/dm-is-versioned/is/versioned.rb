@@ -78,13 +78,14 @@ module DataMapper
             model = DataMapper::Model.new
 
             properties.each do |property|
-              type = property.type
-              type = Class if type == DataMapper::Types::Discriminator
+              type = case property
+                when DataMapper::Property::Discriminator then Class
+                when DataMapper::Property::Serial        then Integer
+              else
+                property.class
+              end
 
-              options = property.options.merge(
-                :key    => property.name == @on,
-                :serial => false
-              )
+              options = property.options.merge(:key => property.name == @on)
 
               model.property(property.name, type, options)
             end
