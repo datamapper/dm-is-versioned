@@ -48,13 +48,7 @@ module DataMapper
       def is_versioned(options = {})
         @on = on = options[:on]
 
-        after_class_method :auto_migrate! do |retval|
-          self::Version.auto_migrate!
-        end
-
-        after_class_method :auto_upgrade! do |retval|
-          self::Version.auto_upgrade!
-        end
+        extend(Migration) if respond_to?(:auto_migrate!)
 
         properties.each do |property|
           name = property.name
@@ -128,6 +122,21 @@ module DataMapper
           version_model.all(query)
         end
       end # InstanceMethods
+
+      module Migration
+
+        def auto_migrate!(repository_name = self.repository_name)
+          super
+          self::Version.auto_migrate!
+        end
+
+        def auto_upgrade!(repository_name = self.repository_name)
+          super
+          self::Version.auto_upgrade!
+        end
+
+      end # Migration
+
     end # Versioned
   end # Is
 end # DataMapper
