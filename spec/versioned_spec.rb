@@ -19,8 +19,10 @@ class Story
   is_versioned :on => :updated_at
 end
 
-if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
-  describe 'DataMapper::Is::Versioned' do
+describe 'DataMapper::Is::Versioned' do
+
+  supported_by :sqlite, :mysql, :postgres do
+
     describe 'inner class' do
       it 'should be present' do
         Story::Version.should be_a_kind_of(DataMapper::Model)
@@ -119,5 +121,7 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
         @story.versions.should == Story::Version.all(:id => @story.id)
       end
     end
+
   end
+
 end
