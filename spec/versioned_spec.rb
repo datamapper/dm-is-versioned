@@ -41,7 +41,6 @@ describe 'DataMapper::Is::Versioned' do
 
     describe '#create' do
       before :all do
-        Story.auto_migrate!
         Story.create(:title => 'A Very Interesting Article')
       end
 
@@ -51,14 +50,10 @@ describe 'DataMapper::Is::Versioned' do
     end
 
     describe '#save' do
-      before :all do
-        Story.auto_migrate!
-      end
-
       describe '(with new resource)' do
         before :all do
           @story = Story.new(:title => 'A Story')
-          @story.save
+          @story.save.should be(true)
         end
 
         it 'should not create a versioned copy' do
@@ -69,7 +64,7 @@ describe 'DataMapper::Is::Versioned' do
       describe '(with a clean existing resource)' do
         before :all do
           @story = Story.create(:title => 'A Story')
-          @story.save
+          @story.save.should be(true)
         end
 
         it 'should not create a versioned copy' do
@@ -82,7 +77,7 @@ describe 'DataMapper::Is::Versioned' do
           @story = Story.create(:title => 'A Story')
           @story.title = 'An Inner Update'
           @story.title = 'An Updated Story'
-          @story.save
+          @story.save.should be(true)
         end
 
         it 'should create a versioned copy' do
@@ -102,8 +97,8 @@ describe 'DataMapper::Is::Versioned' do
 
     describe '#versions' do
       before :all do
-        Story.auto_migrate!
         @story = Story.create(:title => 'A Story')
+        @story.should be_saved
       end
 
       it 'should return an empty array when there are no versions' do
@@ -117,7 +112,7 @@ describe 'DataMapper::Is::Versioned' do
       it "should not return another object's versions" do
         @story2 = Story.create(:title => 'A Different Story')
         @story2.title = 'A Different Title'
-        @story2.save
+        @story2.save.should be(true)
         @story.versions.should == Story::Version.all(:id => @story.id)
       end
     end
