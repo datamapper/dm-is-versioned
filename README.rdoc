@@ -2,11 +2,11 @@
 
 DataMapper plugin enabling <b>simple</b> versioning of models.
 
-When a model is versioned, and updated, instead of <b>the previous version</b> 
-being lost in the mists of time, it <b>is saved in a subsidiary table</b>, so that it 
+When a model is versioned, and updated, instead of <b>the previous version</b>
+being lost in the mists of time, it <b>is saved in a subsidiary table</b>, so that it
 can be restored later if needed.
 
-<b>Please Note!</b> this gem behaves differently to how AR's :acts_as_versioned works. 
+<b>Please Note!</b> this gem behaves differently to how AR's :acts_as_versioned works.
 There is currently no multi version storage possible.
 
 
@@ -25,7 +25,7 @@ Download or clone <tt>dm-is-versioned</tt> from Github[http://github.com/datamap
   $ cd /path/to/dm-is-versioned
 
   $ rake install            # will install dm-is-versioned
-  
+
 
 
 == Getting started
@@ -33,35 +33,35 @@ Download or clone <tt>dm-is-versioned</tt> from Github[http://github.com/datamap
 To start using this gem, just require <tt>dm-is-versioned</tt> in your app.
 
 
-Lets say we have a Post class, and we want to retain the previous version of a post. 
+Lets say we have a Post class, and we want to retain the previous version of a post.
 Just do this:
-  
+
   class Post
     include DataMapper::Resource
-    
+
     property :id,         Serial
     property :title,      String
     property :body,       Text
     property :updated_at, DateTime
-    
+
     is_versioned :on => :updated_at
-    
+
     ## this syntax also works
     # is :versioned, :on => :updated_at
-    
+
   end
 
 
-That simple snippet will automatically create a second <tt>Post::Version</tt> model 
+That simple snippet will automatically create a second <tt>Post::Version</tt> model
 and a (<tt>post_versions</tt>) table in your DB when you auto migrate or auto upgrade:
-  
+
   Post.auto_migrate! # => will run auto_migrate! on Post::Version, too
   Post.auto_upgrade! # => will run auto_upgrade! on Post::Version, too
-  
-  # or 
+
+  # or
   DataMapper.auto_migrate! # => will run auto_migrate! on Post::Version, too
   DataMapper.auto_upgrade! # => will run auto_upgrade! on Post::Version, too
-  
+
   # don't forget to require 'dm-migrations' before you migrate.
 
 
@@ -71,18 +71,18 @@ OK, now that we have a versioned model, let's see what we can do with it.
 == Usage
 
 We start with creating a new Post:
-  
+
   post = Post.create(:title => 'A versioned Post title', :body => "A versioned Post body")
   # automatically saved
-  
 
-When we create this Post, no secondary version is created. 
+
+When we create this Post, no secondary version is created.
 
 The versioning only takes place when we update our Post:
 
   post.title = "An updated & versioned Post title"
   post.save
-  
+
 
 In the <tt>Post::Version</tt> (<tt>post_versions</tt>) table we would now find the previous version of the Post.
 
@@ -108,17 +108,17 @@ Once you have a versioned model, you can retrieve <b>the previous version</b>, l
 
   old_post = post.versions.first
     => #<Post::Version @id=1 @title="A versioned Post title" @body=... @updated_at=...>
-    
+
 
 <b>Please Note!</b> that the <tt>#versions</tt> method returns an array by default.
-  
+
 
 That's basically what <tt>dm-is-versioned</tt> does.
 
 
 == Gotchas
 
-Now there are some gotcha's that might not be entirely obvious to everyone, so let's clarify 
+Now there are some gotcha's that might not be entirely obvious to everyone, so let's clarify
 them here.
 
 === Make sure the versioned trigger has a value
@@ -128,7 +128,7 @@ In this type of scenario:
   class Post
     <snip...>
     property :updated_at, DateTime
-    
+
     is_versioned :on => :updated_at
   end
 
@@ -137,7 +137,7 @@ You must ensure that the versioned trigger always has a value, either through:
 
   # using the dm-timestamps gem, which automatically updates the :updated_at attribute
   timestamps :at
-  
+
   # or a callback method, that updates the value before save
   before(:save) { self.updated_at = Time.now }
 
