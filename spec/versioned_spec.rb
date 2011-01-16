@@ -34,7 +34,10 @@ describe 'DataMapper::Is::Versioned' do
 
       Story.properties.each do |property|
         it "should have its parent's property #{property.name}" do
-          Story::Version.properties.should include(property)
+          Story::Version.properties.any? do |version_property|
+            version_property.name      == property.name &&
+            version_property.primitive == property.primitive
+          end
         end
       end
     end
