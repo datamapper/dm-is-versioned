@@ -46,21 +46,20 @@ module DataMapper
     # TODO: enable replacing a current version with an old version.
     module Versioned
       def is_versioned(options = {})
-        @on = on = options[:on]
+        @on = on = self.properties.slice(*options[:on])
 
         extend(Migration) if respond_to?(:auto_migrate!)
 
-        properties.each do |property|
-          name = property.name
-          before "#{name}=".to_sym do
-            unless (value = property.get(self)).nil? || pending_version_attributes.key?(name)
-              pending_version_attributes[name] = value
+        before :save do                    
+          if on.one? {|o| dirty_attributes.keys.include? o }
+            original_attributes.each do |p, value|
+              pending_version_attributes[p.name] = value
             end
           end
         end
 
         after :update do
-          if clean? && pending_version_attributes.key?(on)
+          if clean? && !pending_version_attributes.empty?
             model::Version.create(attributes.merge(pending_version_attributes))
             pending_version_attributes.clear
           end
