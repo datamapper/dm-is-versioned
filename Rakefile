@@ -2,7 +2,7 @@ require 'rubygems'
 require 'rake'
 
 begin
-  gem 'jeweler', '~> 1.4'
+  gem 'jeweler', '~> 1.5.2'
   require 'jeweler'
 
   Jeweler::Tasks.new do |gem|
@@ -15,10 +15,6 @@ begin
     gem.has_rdoc    = 'yard'
 
     gem.rubyforge_project = 'datamapper'
-
-    gem.add_dependency 'dm-core', '~> 1.0.2'
-
-    gem.add_development_dependency 'rspec', '~> 1.3'
   end
 
   Jeweler::GemcutterTasks.new
