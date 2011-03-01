@@ -180,7 +180,7 @@ Report it here: http://datamapper.lighthouseapp.com/
 
 == Copyright
 
-Copyright (c) 2010 Timothy Bennett. Released under the MIT License.
+Copyright (c) 2011 Timothy Bennett. Released under the MIT License.
 
 See LICENSE for details.
 
