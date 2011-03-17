@@ -73,7 +73,7 @@ module DataMapper
       module ClassMethods
         def const_missing(name)
           if name == :Version
-            model = DataMapper::Model.new
+            model = DataMapper::Model.new(name, self)
 
             properties.each do |property|
               type = case property
@@ -90,7 +90,7 @@ module DataMapper
               model.property(property.name, type, options)
             end
 
-            const_set(name, model)
+            model
           else
             super
           end
