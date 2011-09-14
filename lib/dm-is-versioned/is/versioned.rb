@@ -46,20 +46,23 @@ module DataMapper
     # TODO: enable replacing a current version with an old version.
     module Versioned
       def is_versioned(options = {})
-        @on = on = self.properties.values_at(*options[:on])
+        @on = on = options[:on]
 
         extend(Migration) if respond_to?(:auto_migrate!)
 
-        before :save do                    
-          if on.one? {|o| dirty_attributes.keys.include? o }
-            self.pending_version_attributes = original_attributes
+        properties.each do |property|
+          name = property.name
+          before "#{name}=".to_sym do
+            unless (value = property.get(self)).nil? || pending_version_attributes.key?(name)
+              pending_version_attributes[name] = value
+            end
           end
         end
 
         after :update do
-          if clean? && !pending_version_attributes.empty?
+          if clean? && pending_version_attributes.key?(on)
             model::Version.create(attributes.merge(pending_version_attributes))
-            self.pending_version_attributes = nil
+            pending_version_attributes.clear
           end
         end
 
@@ -104,16 +107,6 @@ module DataMapper
         # @return <Hash>
         def pending_version_attributes
           @pending_version_attributes ||= {}
-        end
-        
-        ##
-        # Allows the set the original values Hash. If the Hash is present,
-        # a Version will be created after save.
-        # 
-        # --
-        # @return <Hash>
-        def pending_version_attributes=(attributes)
-          @pending_version_attributes = attributes
         end
 
         ##
