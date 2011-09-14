@@ -10,9 +10,11 @@ class Story
 
   before :save do
     # For the sake of testing, make sure the updated_at is always unique
+    # use set_attribute to make sure that versioning works if accessors
+    # are not used
     if dirty?
       time = self.updated_at ? self.updated_at + 1 : Time.now
-      self.updated_at = time
+      self.attribute_set(:updated_at, time)
     end
   end
 
